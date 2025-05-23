@@ -84,3 +84,31 @@ export const forgotPassword = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+
+//Reset Password
+
+export const resetPassword = async (req, res) => {
+  try {
+    const { id, token } = req.params;
+    const { password } = req.body;
+
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    if (!decoded) {
+      return res.status(404).json({ message: "Invalid Token" });
+    }
+    const hashPassword = await bcrypt.hash(password, 10);
+
+    //update the user password in db
+    const updateUser = await users.findByIdAndUpdate(
+      id,
+      { password: hashPassword },
+      { new: true }
+    );
+    if (!updateUser) {
+      return res.status(404).json({ message: "User not Found" });
+    }
+    res.status(200).json({ message: "Password Changed Succesfully" });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};

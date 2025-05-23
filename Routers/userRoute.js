@@ -1,5 +1,5 @@
 import express from "express"
-import { forgotPassword, getUser, userLogin, userRegister } from "../Controllers/authController.js";
+import { forgotPassword, getUser, resetPassword, userLogin, userRegister } from "../Controllers/authController.js";
 import { authMiddleware } from "../Middlewares/authMiddleware.js";
 
 
@@ -9,6 +9,7 @@ router.post("/register",userRegister);
 router.post("/login",userLogin);
 router.get("/getdata",authMiddleware,getUser)
 router.post("/forgot-password",forgotPassword)
+router.post("/reset-password/:id/:token",resetPassword)
 
 
 export default router;
