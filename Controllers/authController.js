@@ -31,6 +31,10 @@ export const userLogin = async (req, res) => {
     if (!user) {
       res.status(404).json({ message: "User Not Found" });
     }
+    const passwordMatch = await bcrypt.compare(password, user.password);
+    if (!passwordMatch) {
+      res.status(404).json({ message: "Invalid Password" });
+    }
     const token = jwt.sign({ _id: user._id }, process.env.JWT_SECRET, {
       expiresIn: "1h",
     });
@@ -50,6 +54,32 @@ export const getUser = async (req, res) => {
     const _id = req.user._id;
     const user = await users.findOne({ _id });
     res.status(200).json({ message: `welcome ${user.username}`, data: user });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+//forgot password
+
+export const forgotPassword = async (req, res) => {
+  try {
+    const { email } = req.body;
+    const user = await users.findOne({ email });
+    if (!user) {
+      res.status(404).json({ message: "User Not Found" });
+    }
+    const token = jwt.sign({ _id: user._id }, process.env.JWT_SECRET, {
+      expiresIn: "1h",
+    });
+
+    await sendEmail(
+      user.email,
+      "Password Reset Link",
+      `you are receiving this because you try to reset your password for you acount.
+      Click the following Link to complete the process http://locolhost:5173/reset-password/${user._id}/${token} 
+      please ignore if you have not Requested for reset password`
+    );
+    res.status(200).json({ message: "Email Sent Successfully" });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
