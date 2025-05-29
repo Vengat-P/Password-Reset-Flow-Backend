@@ -79,6 +79,7 @@ export const forgotPassword = async (req, res) => {
       Click the following Link to complete the process https://password-reset-flow-123.netlify.app/reset-password/${user._id}/${token} 
       please ignore if you have not Requested for reset password`
     );
+    
     res.status(200).json({ message: "Email Sent Successfully" });
   } catch (error) {
     res.status(500).json({ message: error.message });
